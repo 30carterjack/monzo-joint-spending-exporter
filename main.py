@@ -6,6 +6,9 @@ from monzo.exceptions import MonzoAuthenticationError, MonzoServerError
 from monzo.endpoints.account import Account
 from monzo.exceptions import MonzoError
 
+from bs4 import BeautifulSoup
+import requests
+
 
 load_dotenv()
 
@@ -24,7 +27,11 @@ def obtain_access_token(client_id: str, client_secret: str, redirect_uri: str):
 def retrieve_access_token(client_id, client_secret, redirect_uri, state):
     monzo = Authentication(client_id=client_id, client_secret=client_secret, redirect_url=redirect_uri)
 
-    code: str = str(input("\nPlease enter your authentication code: "))
+    monzo_login_url: str = str(input("\nPlease enter your login url: "))
+
+    code = monzo_login_url.replace("&state", "").strip().split("=")[1]
+    
+    print(monzo_login_url)
 
     try:
         monzo.authenticate(authorization_token=code, state_token=state)
@@ -63,6 +70,7 @@ def obtain_account_list(client_id, client_secret, redirect_uri, access_token, re
             )
     except MonzoError:
         print("Failed to retrieve accounts")
+
 
 if __name__ == "__main__":
     state = obtain_access_token(client_id, client_secret, redirect_uri)
