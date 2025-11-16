@@ -4,7 +4,6 @@ A list of this project's planned, in-progress, and completed tasks.
 
 # ACTIVE
 
---[ ] Use BS4 to obtain access code from monzo redirect url without user interaction
 - [ ] Implement a handler which stores and refreshes tokens.
 
 # BACKLOG
@@ -17,4 +16,6 @@ A list of this project's planned, in-progress, and completed tasks.
 - [x] Added basic authentication code
 - [x] Refactor basic authentication code into a dedicated function
 - [x] Create a simple function which shows which obtains my account list.
+- [x] implement a method to obtain access code from monzo redirect url which minimises user interaction
+
 
