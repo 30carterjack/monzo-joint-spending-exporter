@@ -6,6 +6,7 @@ from monzo.exceptions import MonzoAuthenticationError, MonzoServerError
 from monzo.endpoints.account import Account
 from monzo.exceptions import MonzoError
 
+
 load_dotenv()
 
 client_id: str = os.getenv("MONZO_CLIENT_ID")
@@ -40,7 +41,31 @@ def retrieve_access_token(client_id, client_secret, redirect_uri, state):
 
     return access_token, refresh_token, expiry
 
+
+def obtain_account_list(client_id, client_secret, redirect_uri, access_token, refresh_token, expiry):
+    print("\nYou will recieve a push notification to your Monzo App. Please approve this data access request and press 1 once complete: ")
+    proceed_flag = int(input(""))
+    
+    monzo = Authentication(
+        client_id=client_id,
+        client_secret=client_secret,
+        redirect_url=redirect_uri,
+        access_token=access_token,
+        access_token_expiry=expiry,
+        refresh_token=refresh_token
+    )
+
+    try:
+        accounts = Account.fetch(monzo)
+        for account in accounts:
+            print(
+                f"Account ID: {account.account_type()} - Balance: {(account.balance.total_balance / 100) if account.balance else 0}"
+            )
+    except MonzoError:
+        print("Failed to retrieve accounts")
+
 if __name__ == "__main__":
     state = obtain_access_token(client_id, client_secret, redirect_uri)
     access_token, refresh_token, expiry = retrieve_access_token(client_id, client_secret, redirect_uri, state)
+    obtain_account_list(client_id, client_secret, redirect_uri, access_token, refresh_token, expiry)
     
