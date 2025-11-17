@@ -4,7 +4,7 @@ A list of this project's planned, in-progress, and completed tasks.
 
 # ACTIVE
 
-- [ ] Implement a handler which stores and refreshes tokens.
+- [ ] Implement a local SQLite database for persistent storage of authentication tokens
 
 # BACKLOG
 
