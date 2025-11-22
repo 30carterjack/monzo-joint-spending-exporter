@@ -12,6 +12,7 @@ A list of this project's planned, in-progress, and completed tasks.
 - [ ] Create a script which checks if the user has created a .env file (useful for setup)
 - [ ] Tidy up type annotations
 - [ ] add a multiline comments (above functions which require it) that explain each function
+- [ ] refactor fetch_transactions to provide options on what period to fetch transactions for
 
 # DONE
 

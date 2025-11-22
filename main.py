@@ -1,6 +1,11 @@
 from dotenv import load_dotenv
 import os
 import time
+import datetime
+import pandas as pd
+from rich.console import Console
+from rich.table import Table
+from rich import box
 
 from monzo.authentication import Authentication
 from monzo.exceptions import MonzoAuthenticationError, MonzoServerError
@@ -9,6 +14,7 @@ from monzo.exceptions import MonzoError
 from monzo.endpoints.transaction import Transaction
 
 import db
+import helper
 
 load_dotenv()
 
@@ -25,11 +31,11 @@ def access_token_handler(client_id: str, client_secret: str, redirect_uri: str):
 
             if is_token_expired(expiry):
                 print("Access token is expired. Generating a new token...")
-                access_token, refresh_token, expiry = obtain_access_token(client_id, client_secret, redirect_uri)
+                access_token, refresh_token, expiry = fetch_access_token(client_id, client_secret, redirect_uri)
                 monzo_client = create_initial_client(access_token, refresh_token, expiry)
         else:
             print("No usable token found. Generating a new token...")
-            access_token, refresh_token, expiry = obtain_access_token(client_id, client_secret, redirect_uri)
+            access_token, refresh_token, expiry = fetch_access_token(client_id, client_secret, redirect_uri)
             monzo_client = create_initial_client(access_token, refresh_token, expiry)
 
         monzo_client = create_client(client_id, client_secret, redirect_uri, access_token, refresh_token, expiry)
@@ -41,7 +47,7 @@ def access_token_handler(client_id: str, client_secret: str, redirect_uri: str):
 def is_token_expired(expiry: int) -> bool:
     return int(expiry) - time.time() < 0
             
-def obtain_access_token(client_id: str, client_secret: str, redirect_uri: str):
+def fetch_access_token(client_id: str, client_secret: str, redirect_uri: str):
     db.drop_expired_access_token()
     monzo = Authentication(client_id=client_id, client_secret=client_secret, redirect_url=redirect_uri)
     print(monzo.authentication_url)
@@ -104,16 +110,44 @@ def create_client(client_id: str, client_secret: str, redirect_uri: str, access_
 
     return monzo_client
 
-def obtain_account_list(monzo_client):
+def fetch_joint_account(monzo_client):
     try:
-        accounts = Account.fetch(monzo_client)
-        for account in accounts:
-            print(
-                f"Account ID: {account.account_type()} - Balance: {(account.balance.total_balance / 100) if account.balance else 0}"
-            )
+        for account in Account.fetch(monzo_client):
+            if "joint account" in account.description.lower():
+                print("Joint account fetched successfully")
+                joint_account: Account = account
+                joint_account_id: str = account.account_id
+                print(f"Joint account - Balance: {helper.normalise_cost(joint_account.balance.total_balance) if joint_account.balance else 0}")
+
+        return joint_account_id
+    
     except MonzoError:
         print("Failed to retrieve accounts")
 
+def fetch_transactions(monzo_client, joint_account_id) -> list[float]:
+    from_date: datetime = (datetime.date.today() - datetime.timedelta(22))
+    to_date: datetime = datetime.date.today()
+    
+    transactions = Transaction.fetch(monzo_client, joint_account_id, since=from_date, before=to_date, expand=["merchant"], limit=100)
+
+    return transactions
+
+def process_transactions(transactions):
+    transaction_dates = [str(transaction.created).split(" ")[0] for transaction in transactions]
+    transaction_merchant = [
+        str(transaction.merchant['name']) if transaction.merchant is not None else "UNKNOWN MERCHANT"
+        for transaction in transactions
+    ]
+    transaction_amount = [helper.normalise_cost(transaction.amount) for transaction in transactions]
+    transaction_category = [
+        str(transaction.merchant['category'].replace("_", " ").capitalize()) if transaction.merchant is not None else "UNKNOWN CATEGORY"
+        for transaction in transactions
+    ]
+
+    return transaction_dates, transaction_merchant, transaction_amount, transaction_category
+
 if __name__ == "__main__":
     monzo_client = access_token_handler(client_id, client_secret, redirect_uri)
-    obtain_account_list(monzo_client)
+    joint_account_id = fetch_joint_account(monzo_client)
+    transactions = fetch_transactions(monzo_client, joint_account_id)
+    transaction_dates, transaction_merchant, transaction_amount, transaction_category = process_transactions(transactions)
