@@ -3,8 +3,8 @@ import os
 import time
 import datetime
 import pandas as pd
-from rich.console import Console
 import openpyxl
+from copy import copy
 
 from monzo.authentication import Authentication
 from monzo.exceptions import MonzoAuthenticationError, MonzoServerError
@@ -158,10 +158,38 @@ def create_transactions_df(transaction_dates, transaction_merchant, transaction_
     return transactions_df
 
 def export_to_excel(transactions_df):
-    directory: str = "excel_exports"
-    name: str = f'Joint_Spending_{helper.current_month()}.xlsx'
-    transactions_df.to_excel(f"./{directory}/{name}")
+    export_directory: str = "excel_exports"
+    current_month: str = helper.current_month()
+    workbook_name: str = f'Joint_Spending_{current_month}.xlsx'
+    export_path: str = f"./{export_directory}/{workbook_name}"
+    transactions_df.to_excel(f"./{export_directory}/{workbook_name}", sheet_name=current_month)
     print("DataFrame exported to Excel successfully")
+
+    return export_path, current_month
+
+def format_excel_workbook(export_path, current_month):
+    workbook = openpyxl.load_workbook(export_path)
+    sheet = workbook[current_month]
+
+    for column in sheet.columns:
+        max_length = 0
+        column_letter = column[0].column_letter
+        for cell in column:
+            try:
+                alignment_obj = copy(cell.alignment)
+                alignment_obj.horizontal = 'center'
+                alignment_obj.vertical = 'center'
+                cell.alignment = alignment_obj
+                if len(str(cell.value)) > max_length:
+                    max_length = len(cell.value)
+            except:
+                pass
+        adjusted_width = (max_length + 2) * 2
+        sheet.column_dimensions[column_letter].width = adjusted_width
+
+    workbook.save(export_path)
+
+    print("Excel workbook formatted successfully.")
 
 if __name__ == "__main__":
     monzo_client = access_token_handler(client_id, client_secret, redirect_uri)
@@ -169,4 +197,5 @@ if __name__ == "__main__":
     transactions = fetch_transactions(monzo_client, joint_account_id)
     transaction_dates, transaction_merchant, transaction_amount, transaction_category = process_transactions(transactions)
     transactions_df = create_transactions_df(transaction_dates, transaction_merchant, transaction_amount, transaction_category )
-    export_to_excel(transactions_df)
+    export_path, current_month = export_to_excel(transactions_df)
+    format_excel_workbook(export_path, current_month)

@@ -4,7 +4,6 @@ A list of this project's planned, in-progress, and completed tasks.
 
 # ACTIVE
 
-- [ ] add a basic export to Excel function
 
 # BACKLOG
 
@@ -26,3 +25,5 @@ A list of this project's planned, in-progress, and completed tasks.
 - [x] Implement an access token handler
 - [x] create lists of relevant transaction information (e.g., when, where, how much) using list comps
 - [x] compile relevant transaction information into a dataframe
+- [x] add a basic export to Excel function
+- [x] add a function which takes the excel export and applies useful formatting (e.g., autocolumn width, centering of text)
