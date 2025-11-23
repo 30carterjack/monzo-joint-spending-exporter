@@ -4,6 +4,8 @@ A list of this project's planned, in-progress, and completed tasks.
 
 # ACTIVE
 
+- [ ] add a basic export to Excel function
+
 # BACKLOG
 
 - [ ] Investigate if sample code for basic metrics (e.g., spend over n days / period) is available, or if this will need to be produced.
@@ -22,3 +24,5 @@ A list of this project's planned, in-progress, and completed tasks.
 - [x] implement a method to obtain access code from monzo redirect url which minimises user interaction
 - [x] Implement a local SQLite database for persistent storage of authentication tokens
 - [x] Implement an access token handler
+- [x] create lists of relevant transaction information (e.g., when, where, how much) using list comps
+- [x] compile relevant transaction information into a dataframe
