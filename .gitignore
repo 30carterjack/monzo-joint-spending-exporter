@@ -2,3 +2,4 @@
 test.py
 monzo_tokens.db
 __pycache__/*
+excel_exports/*
