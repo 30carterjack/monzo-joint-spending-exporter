@@ -4,8 +4,7 @@ import time
 import datetime
 import pandas as pd
 from rich.console import Console
-from rich.table import Table
-from rich import box
+import openpyxl
 
 from monzo.authentication import Authentication
 from monzo.exceptions import MonzoAuthenticationError, MonzoServerError
@@ -125,8 +124,8 @@ def fetch_joint_account(monzo_client):
         print("Failed to retrieve accounts")
 
 def fetch_transactions(monzo_client, joint_account_id) -> list[float]:
-    from_date: datetime = (datetime.date.today() - datetime.timedelta(22))
-    to_date: datetime = datetime.date.today()
+    from_date: datetime = datetime.datetime.now().replace(day=1)
+    to_date: datetime = datetime.datetime.today()
     
     transactions = Transaction.fetch(monzo_client, joint_account_id, since=from_date, before=to_date, expand=["merchant"], limit=100)
 
@@ -146,8 +145,21 @@ def process_transactions(transactions):
 
     return transaction_dates, transaction_merchant, transaction_amount, transaction_category
 
+def create_transactions_df(transaction_dates, transaction_merchant, transaction_amount, transaction_category):
+    transactions_df = pd.DataFrame({
+        "Date": transaction_dates,
+        "Merchant": transaction_merchant,
+        "Amount (£)": transaction_amount,
+        "Category": transaction_category
+    })
+
+    transactions_df["Cumulative Amount (£)"] = transactions_df["Amount (£)"].cumsum()
+
+    return transactions_df
+
 if __name__ == "__main__":
     monzo_client = access_token_handler(client_id, client_secret, redirect_uri)
     joint_account_id = fetch_joint_account(monzo_client)
     transactions = fetch_transactions(monzo_client, joint_account_id)
     transaction_dates, transaction_merchant, transaction_amount, transaction_category = process_transactions(transactions)
+    transactions_df = create_transactions_df(transaction_dates, transaction_merchant, transaction_amount, transaction_category )
