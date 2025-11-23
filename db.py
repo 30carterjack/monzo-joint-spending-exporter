@@ -1,6 +1,7 @@
 import sqlite3
 
 database_name: str = "monzo_tokens.db"
+
 def create_table_if_not_exists():
     try:
         with sqlite3.connect(database_name) as conn:
@@ -17,6 +18,7 @@ def create_table_if_not_exists():
     except sqlite3.OperationalError as e:
         print(e)
 
+
 def insert_access_token(access_token: str, refresh_token: str, expiry: int):
     try:
         with sqlite3.connect(database_name) as conn:
@@ -28,16 +30,18 @@ def insert_access_token(access_token: str, refresh_token: str, expiry: int):
     except sqlite3.OperationalError as e:
         print(e)
 
+
 def fetch_access_token() -> tuple[str, str, int]:
     try:
         with sqlite3.connect(database_name) as conn:
             print(f"Opened SQLite database with version {sqlite3.sqlite_version} successfully.")
             cursor = conn.cursor()
             cursor.execute("""SELECT * FROM tokens LIMIT 1""")  
-            response = cursor.fetchone()
+            response: tuple[str, str, int] = cursor.fetchone()
             return response
     except sqlite3.OperationalError as e:
         print(e)
+
     
 def drop_expired_access_token():
     try:

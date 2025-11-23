@@ -30,7 +30,7 @@ def access_token_handler(client_id: str, client_secret: str, redirect_uri: str) 
         if response and len(response) == 3 and all(response):
             access_token, refresh_token, expiry = response[0], response[1], response[2]
 
-            if is_token_expired(expiry):
+            if helper.is_token_expired(expiry):
                 print("Access token is expired. Generating a new token...")
                 access_token: str
                 refresh_token: str
@@ -55,12 +55,8 @@ def access_token_handler(client_id: str, client_secret: str, redirect_uri: str) 
     except Exception as e:
         print("Unable to connect to local database.", e)
 
-
-def is_token_expired(expiry: int) -> bool:
-    return int(expiry) - time.time() < 0
-
             
-def fetch_access_token(client_id: str, client_secret: str, redirect_uri: str):
+def fetch_access_token(client_id: str, client_secret: str, redirect_uri: str) -> tuple[str, str, int]:
     db.drop_expired_access_token()
 
     monzo: Authentication = Authentication(client_id=client_id, client_secret=client_secret, redirect_url=redirect_uri)
@@ -82,7 +78,7 @@ def fetch_access_token(client_id: str, client_secret: str, redirect_uri: str):
 
     access_token: str = monzo.access_token
     refresh_token: str = monzo.refresh_token
-    expiry: str = monzo.access_token_expiry
+    expiry: int = monzo.access_token_expiry
 
     db.insert_access_token(access_token, refresh_token, expiry)
 
@@ -130,9 +126,7 @@ def fetch_joint_account(monzo_client: Authentication) -> str:
         for account in Account.fetch(monzo_client):
             if "joint account" in account.description.lower():
                 print("Joint account fetched successfully")
-                joint_account: Account = account
                 joint_account_id: str = account.account_id
-                print(f"Joint account - Balance: {helper.normalise_cost(joint_account.balance.total_balance) if joint_account.balance else 0}")
 
         return joint_account_id
     
@@ -167,7 +161,9 @@ def process_transactions(transactions: Transaction) -> tuple[list[str], list[str
     return transaction_dates, transaction_merchant, transaction_amount, transaction_category
 
 
-def create_transactions_df(transaction_dates: list[str], transaction_merchant: list[str], transaction_amount: list[str], transaction_category: list[str]) -> pd.DataFrame:
+def create_transactions_df(transaction_dates: list[str], transaction_merchant: list[str], 
+                           transaction_amount: list[str], transaction_category: list[str]) -> pd.DataFrame:
+    
     transactions_df: pd.DataFrame = pd.DataFrame({
         "Date": transaction_dates,
         "Merchant": transaction_merchant,
