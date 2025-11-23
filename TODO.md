@@ -4,7 +4,6 @@ A list of this project's planned, in-progress, and completed tasks.
 
 # ACTIVE
 
-- [ ] Tidy up type annotations (db.py remaining)
 
 # BACKLOG
 
@@ -29,3 +28,4 @@ A list of this project's planned, in-progress, and completed tasks.
 - [x] compile relevant transaction information into a dataframe
 - [x] add a basic export to Excel function
 - [x] add a function which takes the excel export and applies useful formatting (e.g., autocolumn width, centering of text)
+- [x] Tidy up type annotations 
