@@ -157,9 +157,16 @@ def create_transactions_df(transaction_dates, transaction_merchant, transaction_
 
     return transactions_df
 
+def export_to_excel(transactions_df):
+    directory: str = "excel_exports"
+    name: str = f'Joint_Spending_{helper.current_month()}.xlsx'
+    transactions_df.to_excel(f"./{directory}/{name}")
+    print("DataFrame exported to Excel successfully")
+
 if __name__ == "__main__":
     monzo_client = access_token_handler(client_id, client_secret, redirect_uri)
     joint_account_id = fetch_joint_account(monzo_client)
     transactions = fetch_transactions(monzo_client, joint_account_id)
     transaction_dates, transaction_merchant, transaction_amount, transaction_category = process_transactions(transactions)
     transactions_df = create_transactions_df(transaction_dates, transaction_merchant, transaction_amount, transaction_category )
+    export_to_excel(transactions_df)
