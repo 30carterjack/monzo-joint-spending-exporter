@@ -4,16 +4,18 @@ A list of this project's planned, in-progress, and completed tasks.
 
 # ACTIVE
 
+- [ ] Tidy up type annotations (db.py remaining)
 
 # BACKLOG
 
-- [ ] Investigate if sample code for basic metrics (e.g., spend over n days / period) is available, or if this will need to be produced.
 - [ ] Add comments to .env.example or add a README.md section on where to generate credentials 
 - [ ] Improve obtain_access_token with print statements to make the process clearer to the end-user.
-- [ ] Create a script which checks if the user has created a .env file (useful for setup)
-- [ ] Tidy up type annotations
-- [ ] add a multiline comments (above functions which require it) that explain each function
-- [ ] refactor fetch_transactions to provide options on what period to fetch transactions for
+- [ ] add multiline comments (above functions which require it) that explain each function
+
+# POTENTIAL FUTURE FEATURES
+
+- [ ] Update fetch_transactions function to allow the end-user to specify what period they would like to fetch transactions for
+- [ ] Create additional function(s) that create DataFrames on spend-by-category
 
 # DONE
 
