@@ -216,6 +216,7 @@ def format_excel_workbook(export_path: str, current_month: str):
     workbook.save(export_path)
 
     print("Excel workbook formatted successfully.")
+    
 
 if __name__ == "__main__":
     monzo_client = access_token_handler(client_id, client_secret, redirect_uri)
