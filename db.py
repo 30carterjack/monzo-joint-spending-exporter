@@ -5,7 +5,7 @@ database_name: str = "monzo_tokens.db"
 def create_table_if_not_exists():
     try:
         with sqlite3.connect(database_name) as conn:
-            print(f"Opened SQLite database with version {sqlite3.sqlite_version} successfully.")
+            print(f"\nOpened SQLite database with version {sqlite3.sqlite_version} successfully.")
             cursor = conn.cursor()
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS tokens (
@@ -22,7 +22,7 @@ def create_table_if_not_exists():
 def insert_access_token(access_token: str, refresh_token: str, expiry: int):
     try:
         with sqlite3.connect(database_name) as conn:
-            print(f"Opened SQLite database with version {sqlite3.sqlite_version} successfully.")
+            print(f"\nOpened SQLite database with version {sqlite3.sqlite_version} successfully.")
             cursor = conn.cursor()
             cursor.execute("""INSERT INTO tokens (access_token, refresh_token, expiry) VALUES(?,?,?)
             """,(access_token, refresh_token, expiry))   
@@ -34,7 +34,7 @@ def insert_access_token(access_token: str, refresh_token: str, expiry: int):
 def fetch_access_token() -> tuple[str, str, int]:
     try:
         with sqlite3.connect(database_name) as conn:
-            print(f"Opened SQLite database with version {sqlite3.sqlite_version} successfully.")
+            print(f"\nOpened SQLite database with version {sqlite3.sqlite_version} successfully.")
             cursor = conn.cursor()
             cursor.execute("""SELECT * FROM tokens LIMIT 1""")  
             response: tuple[str, str, int] = cursor.fetchone()
@@ -45,10 +45,13 @@ def fetch_access_token() -> tuple[str, str, int]:
     
 def drop_expired_access_token():
     try:
-        print(f"Opened SQLite database with version {sqlite3.sqlite_version} successfully.")
         with sqlite3.connect(database_name) as conn:
+            print(f"\nOpened SQLite database with version {sqlite3.sqlite_version} successfully.")
             cursor = conn.cursor()
             cursor.execute("""DELETE FROM tokens""")   
             conn.commit()
     except sqlite3.OperationalError as e:
         print(e)
+
+if __name__ == '__main__':
+    drop_expired_access_token()
