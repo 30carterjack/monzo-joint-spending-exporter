@@ -7,10 +7,6 @@ A list of this project's planned, in-progress, and completed tasks.
 
 # BACKLOG
 
-- [ ] Add comments to .env.example or add a README.md section on where to generate credentials 
-- [ ] Improve obtain_access_token with print statements to make the process clearer to the end-user.
-- [ ] add multiline comments (above functions which require it) that explain each function
-
 # POTENTIAL FUTURE FEATURES
 
 - [ ] Update fetch_transactions function to allow the end-user to specify what period they would like to fetch transactions for
@@ -29,3 +25,6 @@ A list of this project's planned, in-progress, and completed tasks.
 - [x] add a basic export to Excel function
 - [x] add a function which takes the excel export and applies useful formatting (e.g., autocolumn width, centering of text)
 - [x] Tidy up type annotations 
+- [x] Add comments to .env.example or add a README.md section on where to generate credentials 
+- [x] Improve obtain_access_token with print statements to make the process clearer to the end-user.
+- [x] add multiline comments (above functions which require it) that explain each function

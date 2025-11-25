@@ -65,6 +65,7 @@ def fetch_access_token(client_id: str, client_secret: str, redirect_uri: str) ->
     helper.wait_event()
 
     state: str = monzo.authentication_url.split("=")[-1]
+    print("\nThe previous action will have sent an email from Monzo to your email address, please paste the attached login URL here: ")
     monzo_login_url: str = str(input("\nPlease enter your login url: "))
     code: str = monzo_login_url.replace("&state", "").strip().split("=")[1]
 
