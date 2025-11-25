@@ -4,7 +4,6 @@ A list of this project's planned, in-progress, and completed tasks.
 
 # ACTIVE
 
-
 # BACKLOG
 
 # POTENTIAL FUTURE FEATURES
