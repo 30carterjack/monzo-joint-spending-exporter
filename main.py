@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 import os
-import time
 import datetime
 import pandas as pd
 import openpyxl
@@ -31,7 +30,7 @@ def access_token_handler(client_id: str, client_secret: str, redirect_uri: str) 
             access_token, refresh_token, expiry = response[0], response[1], response[2]
 
             if helper.is_token_expired(expiry):
-                print("Access token is expired. Generating a new token...")
+                print("\nAccess token is expired. Generating a new token...")
                 access_token: str
                 refresh_token: str
                 expiry: str
@@ -40,7 +39,7 @@ def access_token_handler(client_id: str, client_secret: str, redirect_uri: str) 
 
                 monzo_client: Authentication = create_initial_client(access_token, refresh_token, expiry)
         else:
-            print("No usable token found. Generating a new token...")
+            print("\nNo usable token found. Generating a new token...")
             access_token: str
             refresh_token: str
             expiry: str
@@ -53,14 +52,17 @@ def access_token_handler(client_id: str, client_secret: str, redirect_uri: str) 
         return monzo_client
     
     except Exception as e:
-        print("Unable to connect to local database.", e)
+        print("\nUnable to connect to local database.", e)
 
             
 def fetch_access_token(client_id: str, client_secret: str, redirect_uri: str) -> tuple[str, str, int]:
     db.drop_expired_access_token()
 
     monzo: Authentication = Authentication(client_id=client_id, client_secret=client_secret, redirect_url=redirect_uri)
-    print(monzo.authentication_url)
+    print(f"\n{monzo.authentication_url}")
+    print("\nPlease paste the above URL into your browser and enter the email address associated with your Monzo account.")
+
+    helper.wait_event()
 
     state: str = monzo.authentication_url.split("=")[-1]
     monzo_login_url: str = str(input("\nPlease enter your login url: "))
@@ -91,22 +93,15 @@ def create_initial_client(access_token, refresh_token, expiry) -> Authentication
     approve a data access request in their monzo app before they can use their newly 
     generated token to perform any api calls.
     '''
-    monzo_client: Authentication = create_client(client_id, client_secret, redirect_uri, access_token, refresh_token, expiry)
-    print("\nApp Authorization Required")
-    print("\nPlease approve this access request in your Monzo app. You’ll receive a push notification shortly.")
 
-    while True:
-        user_input: str = str(input("Press ENTER once approved, or type 'cancel' to abort: ").strip().lower())
-        if user_input == "":
-            print("continuing...")
-            break
-        elif user_input == "cancel":
-            print("Operation cancelled by user.")
-            exit(0)
-        else:
-            print("Invalid input. Please press ENTER after approving the request.")
+    monzo_client: Authentication = create_client(client_id, client_secret, redirect_uri, access_token, refresh_token, expiry)
+    print("\nApp Authorization Required\n")
+    print("\nPlease approve this access request in your Monzo app. You’ll receive a push notification shortly.\n")
+
+    helper.wait_event()
 
     return monzo_client
+
 
 def create_client(client_id: str, client_secret: str, redirect_uri: str, access_token: str, refresh_token: str, expiry: int) -> Authentication:
     monzo_client = Authentication(
@@ -125,13 +120,13 @@ def fetch_joint_account(monzo_client: Authentication) -> str:
     try:
         for account in Account.fetch(monzo_client):
             if "joint account" in account.description.lower():
-                print("Joint account fetched successfully")
+                print("\nJoint account fetched successfully")
                 joint_account_id: str = account.account_id
 
         return joint_account_id
     
     except MonzoError:
-        print("Failed to retrieve accounts")
+        print("\nFailed to retrieve accounts")
 
 
 def fetch_transactions(monzo_client: str, joint_account_id: str) -> list[Transaction]:
@@ -184,7 +179,7 @@ def export_to_excel(transactions_df: pd.DataFrame) -> tuple[str, str]:
 
     transactions_df.to_excel(f"./{export_directory}/{workbook_name}", sheet_name=current_month)
 
-    print("DataFrame exported to Excel successfully")
+    print("\nDataFrame exported to Excel successfully")
 
     return export_path, current_month
 
@@ -211,7 +206,7 @@ def format_excel_workbook(export_path: str, current_month: str):
 
     workbook.save(export_path)
 
-    print("Excel workbook formatted successfully.")
+    print("\nExcel workbook formatted successfully.")
     
 
 if __name__ == "__main__":
