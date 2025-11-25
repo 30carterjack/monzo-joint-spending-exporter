@@ -1,15 +1,60 @@
-# Monzo Budget Tracker
+# Monzo Joint Spending Exporter
 
----
+A Python-based tool for fetching Monzo transactions from your joint account, processing them into structured DataFrames, and exporting them to Excel with helpful formatting.
+This project includes:
+- OAuth2 authentication
+- SQLite token persistence
+- DataFrame processing
+- Excel export
+- Dev Container environment for development
 
-Monzo Budget Tracker is a small project that uses the Monzo Developer API to interact with a given account. The objective for this project is not yet fully defined. However, I would like to begin by aggregating weekly/monthly data into a spreadsheet (and potentially sending via email, SMS, or similar) so that I can better track my spending.
+## Features
+### Current Functionality
+- OAuth2 authentication via Monzo API
+- Automatic extraction of tokens from redirect URLs
+- Local SQLite DB for persistent token storage
+- Token handler that auto-refreshes access tokens
+- Fetch account list and recent transactions
+- Convert transaction data → DataFrame
+- Export to Excel with auto-width and centred text formatting
+- Modular file structure: main.py, helper.py, db.py
+- Full type annotations
 
-The Monzo API is designed to be a predictable and intuitive interface for interacting with users' accounts. This API is **not suitable** for building public applications. More information and a description of the Monzo API is available [here](https://docs.monzo.com/#introduction). Alternatively, detailed documentation on how to use the Monzo APi is available [here](https://monzo-api.readthedocs.io/en/latest/access_token.html).
+### Development Environment
+This project was developed using a VS Code Dev Container, allowing the user to run everything inside an isolated and consistent development environment.
+The Dev container includes: 
+- Python runtime environment
+- Docker-in-Docker support
+- Git Graph (VS Code extension)
+- Draw.io (VS Code extension)
+- Automatically activated Python virtual environment (venv)
 
-# Development Notes
+## Built with:
+- Python 3.10
+- Monzo-API
+- Pandas
+- Openpyxl
+- SQLite3
+- Dotenv
+- Dev Containers
 
----
+## Environment Variables
+Create a .env file with:
+- CLIENT_ID=`<your monzo client id>`
+- CLIENT_SECRET=`<your monzo client secret>`
+- REDIRECT_URI=`<your monzo redirect uri>`
 
-- access_token is of type 'str' (or 'TEXT' in db)
-- refresh_token is of type 'str' (or 'TEXT' in db)
-- refresh_token is of type 'int' (or 'INTEGER' in db)
+The Monzo-API provides a guide on how to generate credentials for your Monzo account. The guide can be found [here](https://monzo-api.readthedocs.io/en/latest/monzo_setup.html#creating-a-client).
+
+## Excel Output
+The Excel export of your joint spending will include the following:
+- Date
+- Merchant
+- Amount (£)
+- Category
+- Cumulative Amount (£)
+- Auto-sized columns
+- Centred text
+
+## Contributing
+Any contributions are welcome!
